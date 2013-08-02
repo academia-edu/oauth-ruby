@@ -192,16 +192,22 @@ module OAuth
     # Creates a request and parses the result as url_encoded. This is used internally for the RequestToken and AccessToken requests.
     def token_request(http_method, path, token = nil, request_options = {}, *arguments)
       response = request(http_method, path, token, request_options, *arguments)
+      body = if response.header['content-encoding'] == "gzip"
+               Zlib::GzipReader.new(StringIO.new(response.body)).read
+             else
+               response.body
+             end
+
       case response.code.to_i
 
       when (200..299)
         if block_given?
-          yield response.body
+          yield body
         else
           # symbolize keys
           # TODO this could be considered unexpected behavior; symbols or not?
           # TODO this also drops subsequent values from multi-valued keys
-          CGI.parse(response.body).inject({}) do |h,(k,v)|
+          CGI.parse(body).inject({}) do |h,(k,v)|
             h[k.strip.to_sym] = v.first
             h[k.strip]        = v.first
             h
