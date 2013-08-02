@@ -1,3 +1,8 @@
+=== 0.4.71 2013-08-02
+
+* Fork
+* Ungzip gzipped responses
+
 === 0.4.7 2012-09-03
 
 * Fix merging paths if the path is not empty
