@@ -105,5 +105,13 @@ module OAuth
       end
       new_h
     end
+
+    def uncompressed_body_of(http_response)
+      if http_response.header['content-encoding'] == "gzip"
+        Zlib::GzipReader.new(StringIO.new(http_response.body)).read
+      else                     
+        http_response.body     
+      end                      
+    end
   end
 end
